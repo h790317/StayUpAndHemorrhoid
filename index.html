@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>互動式解說：熬夜與痔瘡的關聯</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chosen Palette: Calm Harmony (Warm neutrals like stone/amber with a muted teal/terracotta accent) -->
+    <!-- Application Structure Plan: A thematic, guided-journey SPA. It starts with the user's core question, moves to an interactive diagram of the 'Vicious Cycle' where clicking nodes reveals details, then summarizes the two key 'Pathways' in a side-by-side comparison, and concludes with a tabbed 'Actionable Advice' section. This structure is chosen to transform the linear report into an exploratory learning experience, promoting engagement and better comprehension of the complex systemic relationships over a simple text scroll. -->
+    <!-- Visualization & Content Choices: The core of the app is an interactive HTML/CSS diagram, not a data chart, as the report is mechanistic, not quantitative. Report Info: Systemic effects of sleep deprivation -> Goal: Explain interconnectedness -> Viz: Clickable diagram of the 'Vicious Cycle' -> Interaction: Click a node (e.g., 'Gut-Brain Axis') to display a detailed explanation card -> Justification: More intuitive and engaging for complex systems than text -> Library: Vanilla JS. For summarizing causal chains, simple HTML/CSS flowcharts are used for clarity. For advice, a tabbed interface organizes content for easy navigation. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: #FDFBF8;
+            color: #44403c;
+        }
+        .active-tab {
+            border-color: #8c6239;
+            color: #8c6239;
+            background-color: #F5F1ED;
+        }
+        .inactive-tab {
+            border-color: transparent;
+            color: #78716c;
+        }
+        .diagram-node {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .diagram-node.active, .diagram-node:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(140, 98, 57, 0.2);
+            border-color: #8c6239;
+        }
+        .arrow {
+            position: absolute;
+            background-color: #a8a29e;
+            z-index: 0;
+        }
+        .arrow::after {
+            content: '';
+            position: absolute;
+            border-style: solid;
+            border-color: transparent;
+        }
+        .arrow-down::after {
+            border-width: 8px 6px 0 6px;
+            border-top-color: #a8a29e;
+            left: 50%;
+            bottom: -8px;
+            transform: translateX(-50%);
+        }
+        .arrow-right::after {
+            border-width: 6px 0 6px 8px;
+            border-left-color: #a8a29e;
+            top: 50%;
+            right: -8px;
+            transform: translateY(-50%);
+        }
+        .arrow-up::after {
+            border-width: 0 6px 8px 6px;
+            border-bottom-color: #a8a29e;
+            left: 50%;
+            top: -8px;
+            transform: translateX(-50%);
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="container mx-auto px-4 py-8 md:py-12 max-w-6xl">
+        
+        <header class="text-center mb-12 md:mb-16">
+            <h1 class="text-3xl md:text-5xl font-bold text-stone-800 mb-4">熬夜真的會導致痔瘡嗎？</h1>
+            <p class="text-lg md:text-xl text-stone-600 max-w-3xl mx-auto">答案是：<strong class="text-[#8c6239]">間接但肯定的</strong>。熬夜並非直接原因，但它會啟動一連串體內失調，為痔瘡的發生鋪好道路。讓我們一同探索這背後的科學原理。</p>
+        </header>
+
+        <main>
+            <section id="interactive-diagram" class="mb-16 md:mb-24">
+                <h2 class="text-2xl md:text-3xl font-bold text-center text-stone-800 mb-4">睡眠剝奪的惡性循環</h2>
+                <p class="text-center text-stone-600 mb-8 md:mb-12 max-w-2xl mx-auto">睡眠不足像一顆投入湖中的石頭，其負面影響會如漣漪般擴散至全身。點擊下方圖示，了解各系統如何受到衝擊，並共同導致痔瘡問題惡化。</p>
+                
+                <div class="flex flex-col lg:flex-row items-center justify-center gap-8 lg:gap-12">
+                    <div class="w-full lg:w-2/3 relative">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-y-12 md:gap-x-8 md:gap-y-16 items-center justify-items-center text-center">
+                            <div class="col-span-1 md:col-span-3">
+                                <button data-target="sleep" class="diagram-node active w-48 h-20 flex items-center justify-center bg-white border-2 border-stone-300 rounded-lg shadow-sm p-4">
+                                    <span class="font-bold text-stone-700">睡眠剝奪</span>
+                                </button>
+                            </div>
+
+                            <button data-target="autonomic" class="diagram-node w-48 h-20 flex items-center justify-center bg-white border-2 border-stone-300 rounded-lg shadow-sm p-4">
+                                <span class="font-bold text-stone-700">自律神經失衡</span>
+                            </button>
+                            <button data-target="gut" class="diagram-node w-48 h-20 flex items-center justify-center bg-white border-2 border-stone-300 rounded-lg shadow-sm p-4">
+                                <span class="font-bold text-stone-700">腸-腦軸紊亂</span>
+                            </button>
+                            <button data-target="immune" class="diagram-node w-48 h-20 flex items-center justify-center bg-white border-2 border-stone-300 rounded-lg shadow-sm p-4">
+                                <span class="font-bold text-stone-700">全身性發炎</span>
+                            </button>
+                            
+                            <div class="col-span-1 md:col-span-3">
+                                <button data-target="hemorrhoid" class="diagram-node w-48 h-20 flex items-center justify-center bg-[#F5F1ED] border-2 border-[#8c6239] rounded-lg shadow-md p-4">
+                                    <span class="font-bold text-[#8c6239]">痔瘡形成/惡化</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="explanation-box" class="w-full lg:w-1/3 p-6 bg-white rounded-lg shadow-lg border border-stone-200 min-h-[20rem] flex flex-col justify-center">
+                    </div>
+                </div>
+                 <p class="text-center text-stone-500 mt-8 text-sm">註：痔瘡疼痛不適會反過來影響睡眠品質，形成惡性循環。</p>
+            </section>
+
+            <section id="pathways" class="mb-16 md:mb-24">
+                <h2 class="text-2xl md:text-3xl font-bold text-center text-stone-800 mb-12">兩條主要的致病路徑</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200">
+                        <h3 class="text-xl font-bold text-center text-[#8c6239] mb-6">路徑一：機械性壓力</h3>
+                        <p class="text-stone-600 mb-6 text-center">這是最直接的影響路徑，將生活習慣轉化為物理傷害。</p>
+                        <div class="space-y-4">
+                            <div class="p-3 bg-stone-100 rounded-md text-center">睡眠剝奪</div>
+                            <div class="text-center text-stone-400">↓</div>
+                            <div class="p-3 bg-stone-100 rounded-md text-center">腸道蠕動失調、菌群失衡</div>
+                            <div class="text-center text-stone-400">↓</div>
+                            <div class="p-3 bg-stone-100 rounded-md text-center"><strong>便秘</strong>，導致排便過度用力</div>
+                            <div class="text-center text-stone-400">↓</div>
+                            <div class="p-3 bg-[#F5F1ED] rounded-md text-center text-[#8c6239] font-semibold">肛門靜脈壓力劇增，形成痔瘡</div>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-md border border-stone-200">
+                        <h3 class="text-xl font-bold text-center text-[#8c6239] mb-6">路徑二：發炎性放大器</h3>
+                        <p class="text-stone-600 mb-6 text-center">此路徑讓身體處於「易燃」狀態，放大局部傷害。</p>
+                        <div class="space-y-4">
+                            <div class="p-3 bg-stone-100 rounded-md text-center">睡眠剝奪</div>
+                            <div class="text-center text-stone-400">↓</div>
+                            <div class="p-3 bg-stone-100 rounded-md text-center">自律神經失調、壓力荷爾蒙紊亂</div>
+                            <div class="text-center text-stone-400">↓</div>
+                            <div class="p-3 bg-stone-100 rounded-md text-center">身體進入<strong>全身性促發炎狀態</strong></div>
+                            <div class="text-center text-stone-400">↓</div>
+                            <div class="p-3 bg-[#F5F1ED] rounded-md text-center text-[#8c6239] font-semibold">局部發炎反應被放大，症狀加劇</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="solutions">
+                <h2 class="text-2xl md:text-3xl font-bold text-center text-stone-800 mb-4">如何打破惡性循環？</h2>
+                <p class="text-center text-stone-600 mb-8 md:mb-12 max-w-2xl mx-auto">理解原理後，我們可以從源頭著手，採取主動策略來預防與緩解問題。</p>
+                
+                <div class="max-w-3xl mx-auto">
+                    <div class="border-b border-stone-300 flex justify-center mb-6">
+                        <button class="tab-btn active-tab py-3 px-6 border-b-2 font-semibold text-lg" data-tab="sleep-advice">改善睡眠</button>
+                        <button class="tab-btn inactive-tab py-3 px-6 border-b-2 font-semibold text-lg" data-tab="diet-advice">飲食策略</button>
+                        <button class="tab-btn inactive-tab py-3 px-6 border-b-2 font-semibold text-lg" data-tab="behavior-advice">行為管理</button>
+                        <button class="tab-btn inactive-tab py-3 px-6 border-b-2 font-semibold text-lg" data-tab="relief-advice">急性緩解</button>
+                    </div>
+                    
+                    <div id="tab-content" class="bg-white p-6 md:p-8 rounded-lg shadow-md border border-stone-200">
+                        <div id="sleep-advice" class="tab-pane">
+                            <ul class="space-y-4 list-disc list-inside text-stone-700">
+                                <li><strong>維持規律作息：</strong>即使是假日，也盡量在固定時間睡覺和起床，以校準生理時鐘。</li>
+                                <li><strong>優化睡眠環境：</strong>保持臥室涼爽、黑暗、安靜。睡前一小時避免使用手機等藍光設備。</li>
+                                <li><strong>建立睡前儀式：</strong>進行溫水泡腳、冥想、深呼吸或閱讀等放鬆活動，幫助身體切換至休息模式。</li>
+                            </ul>
+                        </div>
+                        <div id="diet-advice" class="tab-pane hidden">
+                             <ul class="space-y-4 list-disc list-inside text-stone-700">
+                                <li><strong>攝取高纖維飲食：</strong>足量的水果、蔬菜、全穀物能軟化糞便，從根本預防便秘。</li>
+                                <li><strong>納入發酵食品：</strong>優格、泡菜等富含益生菌，有助於維持腸道菌群平衡。</li>
+                                <li><strong>確保充足水分：</strong>每日飲用1.5至2公升的水，是預防糞便乾硬的最基本要求。</li>
+                            </ul>
+                        </div>
+                        <div id="behavior-advice" class="tab-pane hidden">
+                             <ul class="space-y-4 list-disc list-inside text-stone-700">
+                                <li><strong>規律體育活動：</strong>適度運動能促進腸道蠕動、改善睡眠品質，並幫助控制體重。</li>
+                                <li><strong>養成正確如廁習慣：</strong>有便意就去，避免強忍。排便時專心，不要久坐滑手機。</li>
+                                <li><strong>積極壓力管理：</strong>練習正念、冥想等技巧，有助於調節自律神經，對睡眠和消化都有益。</li>
+                            </ul>
+                        </div>
+                        <div id="relief-advice" class="tab-pane hidden">
+                             <ul class="space-y-4 list-disc list-inside text-stone-700">
+                                <li><strong>溫水坐浴：</strong>每天數次，每次10-15分鐘，能放鬆肌肉，促進循環，有效緩解疼痛。</li>
+                                <li><strong>尋求專業協助：</strong>若症狀嚴重、持續出血或一周未改善，應及時就醫，排除其他疾病並獲得正確治療。</li>
+                                <li><strong>局部治療：</strong>在醫師或藥師指導下，可使用非處方藥膏或栓劑來緩解症狀。</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="text-center mt-16 md:mt-24 pt-8 border-t border-stone-200">
+            <p class="text-stone-500">本資訊基於現有醫學研究整理，僅供衛教參考，不能取代專業醫療建議。如有健康問題，請諮詢醫師。</p>
+        </footer>
+    </div>
+
+    <script>
+        const explanationData = {
+            sleep: {
+                title: "睡眠剝奪",
+                content: "指睡眠不足或睡眠週期紊亂。這是啟動所有問題的源頭，會對身體造成強烈的生理壓力，迫使多個系統失調。"
+            },
+            autonomic: {
+                title: "自律神經失衡",
+                content: "睡眠不足會讓主導「戰鬥或逃跑」的交感神經過度活化，導致血壓升高、血管收縮，增加心血管系統的整體壓力，並可能影響骨盆腔的靜脈血液回流。"
+            },
+            gut: {
+                title: "腸-腦軸紊亂",
+                content: "腸道有自己的生理時鐘。熬夜會打亂這個節律，導致腸道蠕動功能失常，時而過慢（便秘），時而過快（腹瀉）。這是與痔瘡最直接的連結。"
+            },
+            immune: {
+                title: "全身性發炎",
+                content: "睡眠不足會讓身體釋放大量促發炎因子（如C-反應蛋白），使全身處於一種慢性的、低度的發炎狀態，如同一個火藥庫，隨時準備放大局部的發炎反應。"
+            },
+            hemorrhoid: {
+                title: "痔瘡形成/惡化",
+                content: "綜合以上因素：便秘導致的『機械壓力』，加上全身發炎狀態對局部傷害的『放大效應』，共同導致肛門墊組織充血、腫脹、發炎，最終形成有症狀的痔瘡。"
+            }
+        };
+
+        const diagramNodes = document.querySelectorAll('.diagram-node');
+        const explanationBox = document.getElementById('explanation-box');
+
+        function updateExplanation(target) {
+            const data = explanationData[target];
+            explanationBox.innerHTML = `
+                <h3 class="text-xl font-bold text-[#8c6239] mb-3">${data.title}</h3>
+                <p class="text-stone-600 leading-relaxed">${data.content}</p>
+            `;
+            diagramNodes.forEach(node => {
+                node.classList.remove('active');
+                if (node.dataset.target === target) {
+                    node.classList.add('active');
+                }
+            });
+        }
+
+        diagramNodes.forEach(node => {
+            node.addEventListener('click', () => {
+                updateExplanation(node.dataset.target);
+            });
+        });
+
+        updateExplanation('sleep');
+
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabPanes = document.querySelectorAll('.tab-pane');
+
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                tabBtns.forEach(item => {
+                    item.classList.remove('active-tab');
+                    item.classList.add('inactive-tab');
+                });
+                btn.classList.add('active-tab');
+                btn.classList.remove('inactive-tab');
+
+                tabPanes.forEach(pane => {
+                    pane.classList.add('hidden');
+                });
+                document.getElementById(btn.dataset.tab).classList.remove('hidden');
+            });
+        });
+    </script>
+</body>
+</html>
